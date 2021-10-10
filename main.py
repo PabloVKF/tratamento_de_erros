@@ -1,6 +1,8 @@
 import sys
 from typing import List
 
+from exceptions import SaldoInsuficienteError
+
 
 class Cliente:
     def __init__(self, nome: str, cpf: str, profissao: str):
@@ -54,39 +56,58 @@ class ContaCorrente:
     def saldo(self, value):
         if not isinstance(value, int):
             raise ValueError("Valor não é um numero inteiro")
-        if value <= 0:
-            raise ValueError("Valor igual o inferior a zero não podem ser atribuidos")
         self._saldo = value
 
     def transferir(self, valor, favorecido):
-        favorecido.depositar(valor)
+        if valor < 0:
+            raise ValueError("O valor não pode ser inferior a zero")
+        elif self.saldo < valor:
+            raise SaldoInsuficienteError('', self.saldo, valor)
         self.saldo -= valor
+        favorecido.depositar(valor)
 
     def sacar(self, valor):
+        if valor < 0:
+            raise ValueError("O valor não pode ser inferior a zero")
+        elif self.saldo < valor:
+            raise SaldoInsuficienteError('', self.saldo, valor)
         self.saldo -= valor
 
     def depositar(self, valor):
         self.saldo += valor
 
 
-if __name__ == "__main__":
-    # cliente_teste = Cliente('Jhon', '123.456.789-00', 'Desenvolvedor')
-    # print(cliente_teste.__dict__)
-    # conta_corrente = ContaCorrente(cliente_teste, 14, 101)
-    # print(conta_corrente.__dict__)
+# if __name__ == "__main__":
+#     # cliente_teste = Cliente('Jhon', '123.456.789-00', 'Desenvolvedor')
+#     # print(cliente_teste.__dict__)
+#     # conta_corrente = ContaCorrente(cliente_teste, 14, 101)
+#     # print(conta_corrente.__dict__)
+#
+#     contas_teste: List[ContaCorrente] = []
+#     while True:
+#         try:
+#             nome_teste = input("Nome do cliente:\n")
+#             agencia_teste = input("Numero da agencia:\n")
+#             numero_teste = input("Número da conta corrente:\n")
+#             conta_corrente_teste = ContaCorrente(nome_teste, agencia_teste, numero_teste)
+#             contas_teste.append(conta_corrente_teste)
+#         except ValueError as E:
+#             print(E.args)
+#             sys.exit()
+#         except KeyboardInterrupt:
+#             print(f'\n\n{len(contas_teste)}(s) contas criadas')
+#             sys.exit()
 
-    contas: List[ContaCorrente] = []
-    while True:
-        try:
-            nome = input("Nome do cliente:\n")
-            agencia = input("Numero da agencia:\n")
-            numero = input("Número da conta corrente:\n")
-            conta_corrente = ContaCorrente(nome, agencia, numero)
-            contas.append(conta_corrente)
-        except ValueError as E:
-            print(E.args)
-            sys.exit()
-        except KeyboardInterrupt:
-            print(f'\n\n{len(contas)}(s) contas criadas')
-            sys.exit()
+conta_corrente1 = ContaCorrente(None, 24, 563)
+conta_corrente1.depositar(50)
+conta_corrente1.sacar(15)
 
+conta_corrente2 = ContaCorrente(None, 45, 278)
+conta_corrente2.depositar(50)
+conta_corrente2.sacar(5)
+
+print('Saldo:', conta_corrente1.saldo)
+print('Saldo:', conta_corrente2.saldo)
+conta_corrente1.transferir(1000, conta_corrente2)
+print('Saldo:', conta_corrente1.saldo)
+print('Saldo:', conta_corrente2.saldo)
