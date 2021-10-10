@@ -1,7 +1,7 @@
 import sys
 from typing import List
 
-from exceptions import SaldoInsuficienteError
+from exceptions import SaldoInsuficienteError, OperacaoFinanceiraError
 
 
 class Cliente:
@@ -19,7 +19,8 @@ class ContaCorrente:
         self._saldo = 100
         self._agencia = 0
         self._numero = 0
-
+        self.saques_nao_permitidos = 0
+        self.transferencias_nao_permitidas = 0
         self.cliente = cliente
         self._set_agencia(agencia)
         self._set_numero(numero)
@@ -61,15 +62,19 @@ class ContaCorrente:
     def transferir(self, valor, favorecido):
         if valor < 0:
             raise ValueError("O valor não pode ser inferior a zero")
-        elif self.saldo < valor:
-            raise SaldoInsuficienteError('', self.saldo, valor)
-        self.saldo -= valor
+        try:
+            self.sacar(valor)
+        except SaldoInsuficienteError as E:
+            self.transferencias_nao_permitidas += 1
+            E.args = ()
+            raise OperacaoFinanceiraError("Operação não finalizada") from E
         favorecido.depositar(valor)
 
     def sacar(self, valor):
         if valor < 0:
             raise ValueError("O valor não pode ser inferior a zero")
         elif self.saldo < valor:
+            self.saques_nao_permitidos += 1
             raise SaldoInsuficienteError('', self.saldo, valor)
         self.saldo -= valor
 
@@ -108,6 +113,13 @@ conta_corrente2.sacar(5)
 
 print('Saldo:', conta_corrente1.saldo)
 print('Saldo:', conta_corrente2.saldo)
-conta_corrente1.transferir(1000, conta_corrente2)
+try:
+    conta_corrente1.transferir(1000, conta_corrente2)
+except OperacaoFinanceiraError as E:
+    import traceback
+    print(E.saldo)
+    print(E.valor)
+    print("Exceção do tipo:", E.__class__.__name__)
+    traceback.print_exc()
 print('Saldo:', conta_corrente1.saldo)
 print('Saldo:', conta_corrente2.saldo)
