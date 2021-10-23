@@ -1,5 +1,6 @@
 import sys
 from typing import List
+from leitor import LeitorArquivo
 
 from exceptions import SaldoInsuficienteError, OperacaoFinanceiraError
 
@@ -103,23 +104,26 @@ class ContaCorrente:
 #             print(f'\n\n{len(contas_teste)}(s) contas criadas')
 #             sys.exit()
 
-conta_corrente1 = ContaCorrente(None, 24, 563)
-conta_corrente1.depositar(50)
-conta_corrente1.sacar(15)
+# conta_corrente1 = ContaCorrente(None, 24, 563)
+# conta_corrente1.depositar(50)
+# conta_corrente1.sacar(15)
+#
+# conta_corrente2 = ContaCorrente(None, 45, 278)
+# conta_corrente2.depositar(50)
+# conta_corrente2.sacar(5)
+#
+# print('Saldo:', conta_corrente1.saldo)
+# print('Saldo:', conta_corrente2.saldo)
+# try:
+#     conta_corrente1.transferir(1000, conta_corrente2)
+# except OperacaoFinanceiraError as E:
+#     import traceback
+#     print(E.saldo)
+#     print(E.valor)
+#     print("Exceção do tipo:", E.__class__.__name__)
+#     traceback.print_exc()
+# print('Saldo:', conta_corrente1.saldo)
+# print('Saldo:', conta_corrente2.saldo)
 
-conta_corrente2 = ContaCorrente(None, 45, 278)
-conta_corrente2.depositar(50)
-conta_corrente2.sacar(5)
-
-print('Saldo:', conta_corrente1.saldo)
-print('Saldo:', conta_corrente2.saldo)
-try:
-    conta_corrente1.transferir(1000, conta_corrente2)
-except OperacaoFinanceiraError as E:
-    import traceback
-    print(E.saldo)
-    print(E.valor)
-    print("Exceção do tipo:", E.__class__.__name__)
-    traceback.print_exc()
-print('Saldo:', conta_corrente1.saldo)
-print('Saldo:', conta_corrente2.saldo)
+with LeitorArquivo("arquivp.txt") as leitor_teste:
+    leitor_teste.ler_proxima_linha()
